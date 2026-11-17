@@ -1,0 +1,34 @@
+// =====================================================================
+//  KV260 用のデバイスツリーオーバーレイ（ENUM Journal Vol.1 おまけ）
+//  xmutil loadapp cgra で、ビットストリーム（cgra.bit.bin）と一緒に読み込まれる。
+//  pl_clk0 は 100 MHz。CGRA のクロックは回路の中の MMCM がこれから作る（vivado/build.tcl）。
+//  この KV260 の Linux では pl_clk0 の周波数を変えられなかったので、起動時の 100 MHz に合わせてある。
+//
+//  コンパイル: dtc -@ -I dts -O dtb -o cgra.dtbo cgra.dtsi
+// =====================================================================
+/dts-v1/;
+/plugin/;
+
+&fpga_full {
+    firmware-name = "cgra.bit.bin";
+    pid = <0x0>;
+    uid = <0x0>;
+    resets = <&zynqmp_reset 116>;            // PL0 のリセット
+};
+
+&amba {
+    // M_AXI_HPM0_FPD/HPM1_FPD の幅を 128 ビットにする（AFIFS[9:8] と [11:10]。build.tcl と合わせる）
+    afi0: afi0 {
+        compatible = "xlnx,afi-fpga";
+        config-afi = <14 0xa00>;
+    };
+
+    clocking0: clocking0 {
+        compatible = "xlnx,fclk";
+        #clock-cells = <0>;
+        clocks = <&zynqmp_clk 71>;          // 71 = PL0_REF
+        clock-output-names = "fabric_clk";
+        assigned-clocks = <&zynqmp_clk 71>;
+        assigned-clock-rates = <100000000>;
+    };
+};

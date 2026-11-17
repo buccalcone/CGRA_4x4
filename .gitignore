@@ -1,0 +1,14 @@
+# 答え合わせとビルドの生成物
+build/
+
+# Python
+__pycache__/
+*.pyc
+
+# Vivado
+*.jou
+*.log
+.Xil/
+
+# OS
+.DS_Store
